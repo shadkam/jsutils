@@ -8,7 +8,12 @@ var chartColors = {
   purple: 'rgb(153, 102, 255)',
   grey: 'rgb(201, 203, 207)'
 };
-var chartColorArr = [chartColors.red, chartColors.blue, chartColors.green, chartColors.yellow];
+var chartColorArr = [
+  chartColors.red,
+  chartColors.blue,
+  chartColors.orange,
+  chartColors.purple
+];
 var color = Chart.helpers.color;
 
 function bar_dataset(dsLabel, chartColor, dataArr) {
@@ -21,7 +26,10 @@ function bar_dataset(dsLabel, chartColor, dataArr) {
   };
 }
 var canvas = document.getElementById('myChart');
-var data = { labels: [], datasets: [] };
+var data = {
+  labels: [],
+  datasets: []
+};
 var option = {
   scales: {
     yAxes: [{
@@ -44,39 +52,80 @@ var myBarChart = Chart.Bar(canvas, {
   options: option
 });
 
-function data_changed() {
-  var xCol = 1,
-    yCols = [],
-    groupbyCol;
+function read_inputs() {
+  var opts = { yCols: [] };
   $('#durectives').val().split(/[\s,]+/).forEach(function(d) {
+    if (d.indexOf('=')<0) {
+    	opts[d] = true;
+    	return;
+    }
     var dd = d.split("=");
-    if (dd[0] === 'x') xCol = dd[1];
-    else if (dd[0] === 'y') yCols.push(dd[1]);
-    else if (dd[0] === 'groupby') groupbyCol = dd[1];
+    if (dd[0] === 'y') opts.yCols.push(dd[1]);
+    else opts[dd[0]] = dd[1];
   });
-  var rows = $('#raw_data').val().split("\n");
-  if (rows.length > 0) {
-    data.labels = [];
-    data.datasets = [];
+  opts.xCol = opts.x;
+  opts.rows = $('#raw_data').val().split("\n");
+  return opts;
+}
+
+function new_arr(n) {
+	var arr = [];
+	for (var i=0; i<n; i++) arr.push(0);
+  return arr;
+}
+
+function data_changed() {
+	var opts = read_inputs();
+  if (opts.rows.length <= 0) return;
+
+  data.labels = [];
+  data.datasets = [];
+
+	// Headings
+  if (true) {
+    var colorIdx = 0;
+    var cols = opts.rows.shift().split(/\s+/);
+    opts.yCols.forEach(function(yCol) {
+      data.datasets.push(bar_dataset(
+        cols[yCol], chartColorArr[colorIdx++], []
+      ));
+    });
   }
-  if (groupbyCol) {
-    // consolidate data
-  }
-  var colorIdx = 0;
-  for (var ii = 0; ii < rows.length; ii++) {
-    var cols = rows[ii].split(/\s+/);
-    if (ii > 0) data.labels.push(cols[xCol]);
-    for (var j = 0; j < yCols.length; j++) {
-      if (ii === 0) {
-        data.datasets.push(bar_dataset(
-          cols[yCols[j]], chartColorArr[colorIdx++], []
-        ));
-      } else {
-        data.datasets[j].data.push(cols[yCols[j]]);
+
+  var keys_n_rows = [];
+
+	if (true) {
+	  var data_map = {};
+    for (var i = 0; i < opts.rows.length; i++) {
+      var cols = opts.rows[i].split(/\s+/);
+      var key = opts.consolidate ? cols[opts.xCol] : i;
+      if (!data_map[key]) {
+      	data_map[key] = new_arr(opts.yCols.length);
+        keys_n_rows.push([cols[opts.xCol], data_map[key]]);
+      }
+      //console.dir(opts.yCols);
+      for (var j = 0; j < opts.yCols.length; j++) {
+        data_map[key][j] += parseInt(cols[opts.yCols[j]]);
       }
     }
-  };
+	}
+
+	//console.dir(map);
+  console.dir(keys_n_rows);
+  if (opts.sort) keys_n_rows.sort(function(a, b) {
+    return a[0] - b[0];
+	});
+
+	// Render
+  keys_n_rows.forEach(function(key_n_row) {
+    data.labels.push(key_n_row[0]);
+    var j = 0;
+    key_n_row[1].map(function(val) {
+      data.datasets[j++].data.push(val);
+    });
+  });
   console.dir(data.labels);
   myBarChart.update();
 }
+
 data_changed();
