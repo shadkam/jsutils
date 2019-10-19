@@ -1,0 +1,139 @@
+<head>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<style>
+.ans {
+  margin: .25em;
+}
+td {
+  text-align: center;
+}
+#NOK_count {
+  color: red;
+}
+#YOK_count {
+  color: green;
+}
+.result_summary {
+  font-size: 120%;
+  padding: 0 1em 0 1em;
+  margin: 0 0.25em 0 0.25em;
+  border: solid 2px lightgrey;
+  border-radius: 0.5em;
+}
+</style>
+</head>
+<div>
+  <Table align=center border=0>
+    <tr>
+      <td colspan=3>
+        <span id="num1"></span>
+        <span> + </span>
+        <span id="num2"></span>
+        <span> = </span>
+        <span id="result"> ? </span>
+      </td>
+    </tr>
+    <tr>
+      <td colspan=3 align=center>
+        <table border=0 align=center>
+          <tr>
+            <td><span id="ans0"></span></td>
+            <td><span id="ans1"></span></td>
+            <td><span id="ans2"></span></td>
+            <td><span id="ans3"></span></td>
+          </tr>
+          <tr>
+            <td><span id="ans4"></span></td>
+            <td><span id="ans5"></span></td>
+            <td><span id="ans6"></span></td>
+            <td><span id="ans7"></span></td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <td colspan=3 align=center>
+        <div id=next_q_div>
+          <button id=next_question>
+            Next Question
+          </button>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td colspan=3 align=center>
+        <span style="font-size:120%;">results so far: </span>
+        <span class=result_summary id=YOK_count>0</span>
+        <span class=result_summary id=NOK_count>0</span>
+      </td>
+    </tr>
+  </Table>
+
+</div>
+<script>
+$(function(){
+  $('#next_question').hide();
+
+var MAX = 50,
+  YOK_count = 0,
+  NOK_count = 0;
+
+function randomInteger(max) {
+  return 1 + Math.floor(Math.random() * Math.floor(max))
+}
+
+function re_init_page() {
+  var rand1 = randomInteger(MAX);
+  var rand2 = randomInteger(MAX);
+  $('#num1').text(rand1);
+  $('#num2').text(rand2);
+  $('#result').text(' ? ')
+
+  var RESULT = rand1 + rand2;
+
+  var options = {};
+  options[RESULT] = 1;
+  for (var i = 0; i < 2000; i++) {
+    options[randomInteger(MAX * 2)] = 1;
+    var size = 0;
+    for (var j in options) {
+      size++
+    };
+    if (size === 8) break;
+  }
+  var sorted = Object.keys(options).sort(function sortNumber(a, b) {
+    return a - b
+  });
+  sorted.forEach(function(elem, i) {
+    $('#ans' + i).html(
+      '<button class="ans" ans="' + elem + '">' + elem + '</button>'
+    );
+  });
+  $('.ans').on('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var youPicked = $(this).attr('ans') * 1;
+
+    if (youPicked === RESULT) {
+      $('#next_question').show();
+      YOK_count++;
+    } else {
+      $('#next_question').hide();
+      NOK_count++;
+    }
+
+    $('#result').text(youPicked).css(
+      'color', youPicked === RESULT ? 'green' : 'red'
+    );
+    $('#YOK_count').text(YOK_count);
+    $('#NOK_count').text(NOK_count);
+  });
+}
+
+re_init_page();
+$('#next_question').on('click', function() {
+  re_init_page();
+});
+
+});
+</script>
