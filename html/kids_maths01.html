@@ -22,6 +22,7 @@ td {
 }
 </style>
 </head>
+
 <div>
   <Table align=center border=0>
     <tr>
@@ -53,8 +54,8 @@ td {
     </tr>
     <tr>
       <td colspan=3 align=center>
-        <div id=next_q_div>
-          <button id=next_question>
+        <div>
+          <button id=next_question style="margin:1em;">
             Next Question
           </button>
         </div>
@@ -62,7 +63,6 @@ td {
     </tr>
     <tr>
       <td colspan=3 align=center>
-        <span style="font-size:120%;">results so far: </span>
         <span class=result_summary id=YOK_count>0</span>
         <span class=result_summary id=NOK_count>0</span>
       </td>
@@ -70,9 +70,11 @@ td {
   </Table>
 
 </div>
+
+
+
 <script>
 $(function(){
-  $('#next_question').hide();
 
 var MAX = 50,
   YOK_count = 0,
@@ -83,6 +85,8 @@ function randomInteger(max) {
 }
 
 function re_init_page() {
+  $('#next_question').hide();
+
   var rand1 = randomInteger(MAX);
   var rand2 = randomInteger(MAX);
   $('#num1').text(rand1);
@@ -109,6 +113,7 @@ function re_init_page() {
       '<button class="ans" ans="' + elem + '">' + elem + '</button>'
     );
   });
+  $('#ans').show();
   $('.ans').on('click', function(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -117,6 +122,7 @@ function re_init_page() {
     if (youPicked === RESULT) {
       $('#next_question').show();
       YOK_count++;
+      $('.ans').hide();
     } else {
       $('#next_question').hide();
       NOK_count++;
@@ -134,6 +140,7 @@ re_init_page();
 $('#next_question').on('click', function() {
   re_init_page();
 });
+
 
 });
 </script>
