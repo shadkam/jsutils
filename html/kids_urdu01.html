@@ -1,58 +1,60 @@
 <head>
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-3502216-4"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'UA-3502216-4');
-</script>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-3502216-4"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag("js", new Date());
+    gtag("config", "UA-3502216-4");
+  </script>
 
-<script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <meta name=”viewport” content=”width=device-width, initial-scale=1″>
-<style>
-div,td,span,button {
-  font-size: 5vw;
-}
-.ans {
-  margin: .25em;
-}
-td {
-  text-align: center;
-}
-#NOK_count {
-  color: red;
-}
-#YOK_count {
-  color: green;
-}
-.result_summary {
-  font-size: 120%;
-  padding: 0 1em 0 1em;
-  margin: 0 0.25em 0 0.25em;
-  border: solid 2px lightgrey;
-  border-radius: 0.5em;
-}
-@media all and (max-width: 699px) and (min-width: 520px), (min-width: 1151px) {
-   body {
-  }
-}
-</style>
-    <link rel="stylesheet" media="screen" href="//fonts.googleapis.com/css?family=Inconsolata" />
-    <style type="text/css" media="screen">
-    </style>
+  <style>
+    div,
+    td,
+    span,
+    button {
+      font-size: 5vw;
+    }
+    .ans {
+      margin: 0.25em;
+    }
+    td {
+      text-align: center;
+    }
+    #NOK_count {
+      color: red;
+    }
+    #YOK_count {
+      color: green;
+    }
+    .result_summary {
+      font-size: 120%;
+      padding: 0 1em 0 1em;
+      margin: 0 0.25em 0 0.25em;
+      border: solid 2px lightgrey;
+      border-radius: 0.5em;
+    }
+    @media all and (max-width: 699px) and (min-width: 520px), (min-width: 1151px) {
+      body {
+      }
+    }
+  </style>
+  <link rel="stylesheet" media="screen" href="//fonts.googleapis.com/css?family=Inconsolata" />
+  <style type="text/css" media="screen"></style>
 </head>
 
 <div>
-  <Table align=center border=0>
+  <table align="center" border="0">
     <tr>
-      <td colspan=3>
-        which letter is <button id="letter" txt=""></button>
-      </td>
+      <td colspan="3">which letter is <button id="letter" txt=""></button></td>
     </tr>
     <tr>
-      <td colspan=3 align=center>
-        <table border=0 align=center>
+      <td colspan="3" align="center">
+        <table border="0" align="center">
           <tr>
             <td><span id="ans3"></span></td>
             <td><span id="ans2"></span></td>
@@ -69,124 +71,126 @@ td {
       </td>
     </tr>
     <tr>
-      <td colspan=3 align=center>
+      <td colspan="3" align="center">
         <div>
-          <button id=next_question style="margin:1em;">
+          <button id="next_question" style="margin:1em;">
             Next Question
           </button>
         </div>
       </td>
     </tr>
     <tr>
-      <td colspan=3 align=center>
-        <span class=result_summary id=YOK_count>0</span>
-        <span class=result_summary id=NOK_count>0</span>
+      <td colspan="3" align="center">
+        <span class="result_summary" id="YOK_count">0</span>
+        <span class="result_summary" id="NOK_count">0</span>
       </td>
     </tr>
-  </Table>
-
+  </table>
 </div>
 
-
-
 <script>
-function sayText(txt){
+  function sayText(txt) {
     var msg = new SpeechSynthesisUtterance(txt);
+
+    // window.speechSynthesis.getVoices().some((voice) => {
+    //   if (voice.name === "Maged") {
+    //     msg.voice = voice;
+    //     return true;
+    //   }
+    // });
+
     msg.rate = 0.25;
     msg.volume = 10;
-    //msg.lang = 'ar-SA';
+    msg.lang = "ar-SA";
     window.speechSynthesis.speak(msg);
-}
-var letters = [
-    ['&#x0627;', 'Alif'],
-    ['&#x0628;', 'Be'],
-    ['&#x062A;', 'Te'],
-    ['&#x062B;', 'Se'],
-    ['&#x062C;', 'Jeem'],
-    ['&#x062D;', 'Ha'],
-    ['&#x062E;', 'KHha'],
-    ['&#x062F;', 'Daal'],
-    ['&#x0630;', 'Zaal'],
-    ['&#x0631;', 'Ray'],
-    ['&#x0632;', 'Zay'],
-    ['&#x0633;', 'Seen'],
-    ['&#x0634;', 'Sheen'],
-    ['&#x0635;', 'Swaad'],
-    ['&#x0636;', 'Zwaad'],
-    ['&#x0637;', 'Toe'],
-    ['&#x0638;', 'Zoe'],
-    ['&#x0639;', 'Ayn'],
-    ['&#x063A;', 'Ghayn'],
-    ['&#x0641;', 'Fe'],
-    ['&#x0642;', 'Qaaf'],
-    ['&#x0643;', 'Kaaf'],
-    ['&#x0644;', 'Laam'],
-    ['&#x0645;', 'Meem'],
-    ['&#x0646;', 'Nun'],
-    ['&#x0647;', 'Ha'],
-    ['&#x0648;', 'Wow'],
-    ['&#x064A;', 'Ye'],
-    ['&#x0622;', 'Alif Maddah'],
-    ['&#x0629;', 'Ta / Ha'],
-    ['&#x0649;', 'Ye'],
-];
-$(function(){
-  $('#letter').on('click', function(){
-    sayText($(this).attr('txt'));
-  });
-var MAX = 50,
-  YOK_count = 0,
-  NOK_count = 0;
-function randomInteger(max) {
-  return Math.floor(Math.random() * Math.floor(max))
-}
-function re_init_page() {
-  $('#next_question').hide();
-  var rand1 = randomInteger(letters.length);
-  $('#letter').attr( 'txt', letters[rand1][1] ).text( letters[rand1][1] );
-  var RESULT = rand1;
-  var options = {};
-  options[RESULT] = 1;
-  for (var i = 0; i < 2000; i++) {
-    var xx = randomInteger(letters.length);
-    options[xx] = 1;
-    var size = 0;
-    for (var j in options) {
-      size++
-    };
-    if (size === 8) break;
   }
-  var sorted = Object.keys(options).sort(function sortNumber(a, b) {
-    return a - b
-  });
-  sorted.forEach(function(elem, i) {
-    $('#ans' + i).html(
-      '<button class="ans" ans="' + elem + '">' + letters[elem][0] + '</button>'
-    );
-  });
-  $('#ans').show();
-  $('.ans').on('click', function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    var youPicked = $(this).attr('ans')*1;
-    if (youPicked === RESULT) {
-      $('#next_question').show();
-      YOK_count++;
-      $('.ans').hide();
-    } else {
-      $('#next_question').hide();
-      NOK_count++;
+  var letters = [
+    ["&#x0627;", "Alif", "ا"],
+    ["&#x0628;", "Be", "ب"],
+    ["&#x062A;", "Te", "ت"],
+    ["&#x062B;", "Se", "ث"],
+    ["&#x062C;", "Jeem", "ج"],
+    ["&#x062D;", "Ha", "ح"],
+    ["&#x062E;", "KHha", "خ"],
+    ["&#x062F;", "Daal", "د"],
+    ["&#x0630;", "Zaal", "ذ"],
+    ["&#x0631;", "Ray", "ر"],
+    ["&#x0632;", "Zay", "ز"],
+    ["&#x0633;", "Seen", "س"],
+    ["&#x0634;", "Sheen", "ش"],
+    ["&#x0635;", "Swaad", "ص"],
+    ["&#x0636;", "Zwaad", "ض"],
+    ["&#x0637;", "Toe", "ط"],
+    ["&#x0638;", "Zoe", "ظ"],
+    ["&#x0639;", "Ayn", "ع"],
+    ["&#x063A;", "Ghayn", "غ"],
+    ["&#x0641;", "Fe", "ف"],
+    ["&#x0642;", "Qaaf", "ق"],
+    ["&#x0643;", "Kaaf", "ك"],
+    ["&#x0644;", "Laam", "ل"],
+    ["&#x0645;", "Meem", "م"],
+    ["&#x0646;", "Nun", "ن"],
+    ["&#x0647;", "Ha", "ه"],
+    ["&#x0648;", "Wow", "و"],
+    ["&#x064A;", "Ye", "ي"]
+  ];
+  $(function() {
+    $("#letter").on("click", function() {
+      sayText($(this).attr("txt"));
+    });
+    var MAX = 50,
+      YOK_count = 0,
+      NOK_count = 0;
+    function randomInteger(max) {
+      return Math.floor(Math.random() * Math.floor(max));
     }
-    $('#result').text(youPicked).css(
-      'color', youPicked === RESULT ? 'green' : 'red'
-    );
-    $('#YOK_count').text(YOK_count);
-    $('#NOK_count').text(NOK_count);
+    function re_init_page() {
+      $("#next_question").hide();
+      var rand1 = randomInteger(letters.length);
+      $("#letter")
+        .attr("txt", letters[rand1][2])
+        .text(letters[rand1][1]);
+      var RESULT = rand1;
+      var options = {};
+      options[RESULT] = 1;
+      for (var i = 0; i < 2000; i++) {
+        var xx = randomInteger(letters.length);
+        options[xx] = 1;
+        var size = 0;
+        for (var j in options) {
+          size++;
+        }
+        if (size === 8) break;
+      }
+      var sorted = Object.keys(options).sort(function sortNumber(a, b) {
+        return a - b;
+      });
+      sorted.forEach(function(elem, i) {
+        $("#ans" + i).html('<button class="ans" ans="' + elem + '">' + letters[elem][0] + "</button>");
+      });
+      $("#ans").show();
+      $(".ans").on("click", function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var youPicked = $(this).attr("ans") * 1;
+        if (youPicked === RESULT) {
+          $("#next_question").show();
+          YOK_count++;
+          $(".ans").hide();
+        } else {
+          $("#next_question").hide();
+          NOK_count++;
+        }
+        $("#result")
+          .text(youPicked)
+          .css("color", youPicked === RESULT ? "green" : "red");
+        $("#YOK_count").text(YOK_count);
+        $("#NOK_count").text(NOK_count);
+      });
+    }
+    re_init_page();
+    $("#next_question").on("click", function() {
+      re_init_page();
+    });
   });
-}
-re_init_page();
-$('#next_question').on('click', function() {
-  re_init_page();
-});
-});
 </script>
