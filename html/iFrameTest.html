@@ -1,0 +1,16 @@
+Enter iFrameSrc url param with full url to test-load<br>
+<DIV style="margin:2em;">
+<script>
+// thanks to https://stackoverflow.com/questions/831030/how-to-get-get-request-parameters-in-javascript
+function param(name){
+   if(name=(new RegExp('[?&]'+encodeURIComponent(name)+'=([^&]*)')).exec(location.search))
+      return decodeURIComponent(name[1]);
+}
+var iFrameSrc = param('iFrameSrc');
+if (iFrameSrc) {
+    document.write( '<IFRAME src="'+iFrameSrc+'" rows=10 cols=80></IFRAME>' );
+} else {
+    document.write( 'iFrameSrc not found' );
+}
+</script>
+</DIV>
