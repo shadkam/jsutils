@@ -3,18 +3,11 @@
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <title>Covid19 aantel gemeente wise</title>
 <style>
-.inputSpan {
-  border:solid grey 1px;
-  border-radius:.3em;
-  padding:.1em;
-  margin: 0 1em 0 1em;
-}
-input[type=number]{
-    width: 4em;
-    color: blue;
+body {
+    margin: 0;
+    padding: 0;
 }
 </style>
-
 
 <script type="text/javascript" src="//code.jquery.com/jquery-2.1.3.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.3/Chart.min.js"></script>
@@ -25,17 +18,26 @@ input[type=number]{
 
 </head>
 <body>
-  
 <!-- Thanks to https://github.com/J535D165/CoronaWatchNL -->
-<DIV> with thanks to https://github.com/J535D165/CoronaWatchNL whose data this chart uses </DIV>
+<DIV style="padding: .2em; border-bottom: darkgrey .2em solid; margin-bottom: .2em; background-color:#f9f9f9;">
+    <div style="font-size:125%;"><b>Gemeente-wise daily new cases .. </b></div>
+    <div style="text-align:right;">( based on data from <a
+      href="https://github.com/J535D165/CoronaWatchNL">
+            https://github.com/J535D165/CoronaWatchNL
+      </a>, with many thanks to https://github.com/J535D165/CoronaWatchNL )
+    </div>
+</DIV>
+<DIV style="margin:.3em 0 .3em 0; border-bottom:solid darkgrey 1px;">
+    <table id="myDataTable" class="display compact" width="100%"></table>
+</DIV>
 
-<table id="myDataTable" class="display" width="100%"></table>
-<div align=center style="margin-top:.5em;">
+<DIV style="margin-top:.5em; padding-top:0.3em; border-top:solid darkgrey .2em;">
+<div align=center>
     <button id="show_less_in_graph_month">one less month</button>
     &nbsp;
     <button id="show_less_in_graph_week">one less week</button>
     &nbsp;
-    <button id="plot_for_selected_rows">plot for the selected rows</button>
+    <button id="plot_for_selected_rows" style="color:blue;">plot for the selected rows</button>
     &nbsp;
     <button id="show_more_in_graph_week">one more week</button>
     &nbsp;
@@ -45,16 +47,22 @@ input[type=number]{
     &nbsp;&nbsp;
     <button id="clear_selection">clear selection</button>
 </div>
+<div id="plot_msg_hint" style="font-size:120%;color:blue;margin-top:.5em; text-align:center;">
+    to plot a timeseries graph, please select desired rows from
+    above table, and press the button "plot for the selected rows"
+</div>
 <div class="chart-container"
     style="position: relative; height:30vh; width:80vw;">
     <canvas id="myChart01" ></canvas>
 </div>
+</DIV>
 
 <script type="text/javascript">//<![CDATA[
 var chartColorArr = [
     '#0000FF', '#00FF00', '#FF0000',
     '#FF00FF', '#00FFFF',
 ];
+var colorHelperFn = Chart.helpers.color;
 function getRandomColor() {
     var letters = '0123456789ABCDEF'.split('');
     var color = '#';
@@ -87,6 +95,7 @@ function drawChart(){
         showGemeentesCount++;
     });
     if ( !showGemeentesCount ) { alert('nothing selected'); return }
+    $('#plot_msg_hint').hide(); // we are plotting it
 
     var ds0 = [];
     var colorIdx = 0;
