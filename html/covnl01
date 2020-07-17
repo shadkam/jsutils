@@ -1,0 +1,188 @@
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>Covid19 aantel gemeente wise</title>
+<style>
+</style>
+
+
+<script type="text/javascript" src="//code.jquery.com/jquery-2.1.3.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.3/Chart.min.js"></script>
+<script src="//cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+
+</head>
+<body>
+<!-- Thanks to https://github.com/J535D165/CoronaWatchNL -->
+<DIV> with thanks to https://github.com/J535D165/CoronaWatchNL whose data this chart uses </DIV>
+<table id="myDataTable" class="display" width="100%"></table>
+<div align=center>
+    <button id="plot_for_selected_rows">plot for the selected rows</button>
+    <button id="clear_selection">clear selection</button>
+</div>
+<div class="chart-container"
+    style="position: relative; height:30vh; width:80vw;">
+    <canvas id="myChart01" ></canvas>
+</div>
+
+<script type="text/javascript">//<![CDATA[
+var chartColorArr = [
+    '#0000FF', '#00FF00', '#FF0000',
+    '#FFFF00', '#FF00FF', '#00FFFF',
+];
+function getRandomColor() {
+    var letters = '0123456789ABCDEF'.split('');
+    var color = '#';
+    for (var i = 0; i < 6; i++ ) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+var color = Chart.helpers.color;
+var myChart;
+function drawChart(dates, gemeenteDateAantals){
+
+    var showGemeentesCount = 0;
+    var showGemeentes = {};
+    $('#myDataTable').DataTable().rows('.selected').data().each(function(e,i){
+        showGemeentes[e[0]] = 1
+        showGemeentesCount++;
+    });
+    if ( !showGemeentesCount ) { alert('nothing selected'); return }
+
+    var ds0 = [];
+    var colorIdx = 0;
+    for (var gnaam in gemeenteDateAantals) {
+        if (!showGemeentes[gnaam]) continue;
+        var tmp = [];
+        for (var i=0; i<dates.length; i++) {
+            tmp.push(gemeenteDateAantals[gnaam][dates[i]]);
+        }
+        var chartColor = colorIdx<chartColorArr.length?chartColorArr[colorIdx++]:getRandomColor();
+        ds0.push({ label: gnaam, data: tmp,
+            backgroundColor: chartColor,
+            borderColor: chartColor,
+        });
+    }
+    if (myChart) myChart.destroy();
+    myChart = new Chart(document.getElementById("myChart01"), {
+      type: 'line',
+      data: {
+        labels: dates,
+        datasets: ds0,
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    stacked: false,
+                    gridLines: {
+                        display: true,
+                        color: "rgba(255,99,132,0.2)"
+                    }
+                }],
+                xAxes: [{
+                    gridLines: {
+                        display: false
+                    }
+                }]
+            }
+        }
+    });
+}
+function drawDataTable(dates, gemeenteDateAantals){
+    console.dir(gemeenteDateAantals);
+    var last_n = 14;
+    var dateBegIdx = dates.length<last_n?0:dates.length-last_n;
+    var rows = [];
+    for (var gnaam in gemeenteDateAantals) {
+        var row = [ gnaam ];
+        var sum = 0;
+        for (var i=dateBegIdx; i<dates.length; i++) {
+            var num = gemeenteDateAantals[gnaam][dates[i]];
+            row.push(num);
+            sum += 1*num;
+        }
+        row.push(sum);
+        rows.push(row);
+    }
+    var head = [ { title: 'Gemeente' } ];
+    for (var i=dateBegIdx; i<dates.length; i++) {
+        head.push({ title: dates[i].substr(5) });
+    }
+    head.push({ title: 'sum (last '+last_n+' days)' });
+    $('#myDataTable').DataTable( {
+        data: rows,
+        columns: head,
+        "order": [[ last_n+1, "desc" ]],
+    } );
+
+    $('#myDataTable tbody').on( 'click', 'tr', function () {
+        $(this).toggleClass('selected');
+    } );
+}
+var RawData;
+function processData(allText) {
+    var allTextLines = allText.split(/\r\n|\n/);
+    var headers = allTextLines[0].split(',');
+    var idx = {};
+    var weHaveType = false;
+    for (var i=0; i<headers.length; i++) {
+        idx[headers[i]] = i;
+        if (headers[i]==='Type') weHaveType = true;
+    }
+    var gemeenteDateAantals = {};
+    var datesMap = {};
+    for (var i=1; i<allTextLines.length; i++) {
+        var data = allTextLines[i].split(',');
+        if (data.length!=headers.length) continue;
+        var Type = weHaveType ? data[idx["Type"]] : '';
+        if (weHaveType && Type!=="Totaal") continue;
+        var date = data[idx["Datum"]];
+        var aantal = data[idx["Aantal"]];
+        var gnaam = data[idx["Gemeentenaam"]];
+        if (date && gnaam && aantal!=null && date > "2020-07-01" ) {
+            if (!gemeenteDateAantals[gnaam]) gemeenteDateAantals[gnaam] = {};
+            gemeenteDateAantals[gnaam][date] = aantal;
+            datesMap[date] = 1;
+        }
+    }
+    var dates = Object.keys(datesMap).sort();
+    for (var g in gemeenteDateAantals) {
+        var prev = gemeenteDateAantals[g][dates[0]];
+        dates.forEach(function(date){
+            var delta = gemeenteDateAantals[g][date]-prev;
+            prev = gemeenteDateAantals[g][date];
+            gemeenteDateAantals[g][date] = delta;
+        });
+    }
+    RawData = { dates: dates, gemeenteDateAantals: gemeenteDateAantals, };
+    
+    drawDataTable(dates, gemeenteDateAantals);
+}
+function loadRawData() {
+    if (RawData) {  return; }
+    $.ajax({
+        url: 'https://raw.githubusercontent.com/J535D165/CoronaWatchNL/master/data/rivm_NL_covid19_total_municipality.csv',//"RIVM_NL_municipal.txt",
+        type: "GET",
+        success: function(response) {
+            processData(response);
+        },
+        error: function(xhr, status) {
+            console.dir([xhr, status]);
+            alert("error "+status);
+        }
+    });
+}
+$(function(){
+    loadRawData();
+});
+$('button#plot_for_selected_rows').on('click', function() {
+    drawChart(RawData.dates, RawData.gemeenteDateAantals); 
+});
+$('button#clear_selection').on('click', function() {
+    $("#myDataTable").DataTable().rows('.selected').nodes().to$().removeClass('selected');
+});
+</script>
+
+</body>
+</html>
