@@ -98,7 +98,7 @@ function drawChart(){
         }
         var chartColor = colorIdx<chartColorArr.length?chartColorArr[colorIdx++]:getRandomColor();
         ds0.push({ label: gnaam, data: tmp,
-            backgroundColor: chartColor,
+            backgroundColor: Chart.helpers.color(chartColor).alpha(0.05).rgbString(),
             borderColor: chartColor,
         });
     }
