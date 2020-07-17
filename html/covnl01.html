@@ -3,21 +3,46 @@
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <title>Covid19 aantel gemeente wise</title>
 <style>
+.inputSpan {
+  border:solid grey 1px;
+  border-radius:.3em;
+  padding:.1em;
+  margin: 0 1em 0 1em;
+}
+input[type=number]{
+    width: 4em;
+    color: blue;
+}
 </style>
 
 
 <script type="text/javascript" src="//code.jquery.com/jquery-2.1.3.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.3/Chart.min.js"></script>
 <script src="//cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+<script src="//cdn.datatables.net/buttons/1.6.2/js/dataTables.buttons.min.js"></script>
 <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/buttons/1.6.2/css/buttons.dataTables.min.css">
 
 </head>
 <body>
+  
 <!-- Thanks to https://github.com/J535D165/CoronaWatchNL -->
 <DIV> with thanks to https://github.com/J535D165/CoronaWatchNL whose data this chart uses </DIV>
+
 <table id="myDataTable" class="display" width="100%"></table>
-<div align=center>
+<div align=center style="margin-top:.5em;">
+    <button id="show_less_in_graph_month">one less month</button>
+    &nbsp;
+    <button id="show_less_in_graph_week">one less week</button>
+    &nbsp;
     <button id="plot_for_selected_rows">plot for the selected rows</button>
+    &nbsp;
+    <button id="show_more_in_graph_week">one more week</button>
+    &nbsp;
+    <button id="show_more_in_graph_month">one more month</button>
+    &nbsp;&nbsp;
+    &nbsp;&nbsp;
+    &nbsp;&nbsp;
     <button id="clear_selection">clear selection</button>
 </div>
 <div class="chart-container"
@@ -28,7 +53,7 @@
 <script type="text/javascript">//<![CDATA[
 var chartColorArr = [
     '#0000FF', '#00FF00', '#FF0000',
-    '#FFFF00', '#FF00FF', '#00FFFF',
+    '#FF00FF', '#00FFFF',
 ];
 function getRandomColor() {
     var letters = '0123456789ABCDEF'.split('');
@@ -38,9 +63,22 @@ function getRandomColor() {
     }
     return color;
 }
+var days_step_size_table = 3;
+var table_last_n_days = 14;
+var graph_last_n_days = 30;
+var days_step_size_graph = 7;
 var color = Chart.helpers.color;
 var myChart;
-function drawChart(dates, gemeenteDateAantals){
+function drawChart(){
+    var dates = RawData.dates,
+        gemeenteDateAantals = RawData.gemeenteDateAantals;
+    var last_n = graph_last_n_days;
+    var dateBegIdx = dates.length<last_n?0:dates.length-last_n;
+    var dates_new = [];
+    for (var i=dateBegIdx; i<dates.length; i++) {
+        dates_new.push(dates[i]);
+    }
+    dates = dates_new;
 
     var showGemeentesCount = 0;
     var showGemeentes = {};
@@ -89,9 +127,12 @@ function drawChart(dates, gemeenteDateAantals){
         }
     });
 }
+var myDataTable;
 function drawDataTable(dates, gemeenteDateAantals){
-    console.dir(gemeenteDateAantals);
-    var last_n = 14;
+    var dates = RawData.dates,
+        gemeenteDateAantals = RawData.gemeenteDateAantals;
+    // console.dir(gemeenteDateAantals);
+    var last_n = table_last_n_days;
     var dateBegIdx = dates.length<last_n?0:dates.length-last_n;
     var rows = [];
     for (var gnaam in gemeenteDateAantals) {
@@ -110,15 +151,39 @@ function drawDataTable(dates, gemeenteDateAantals){
         head.push({ title: dates[i].substr(5) });
     }
     head.push({ title: 'sum (last '+last_n+' days)' });
-    $('#myDataTable').DataTable( {
+
+    var firstTime = true;
+    if ( $.fn.DataTable.isDataTable('#myDataTable') ) {
+        $('#myDataTable').DataTable().destroy();
+        $('#myDataTable tbody').empty();
+        $('#myDataTable thead').empty();
+        firstTime = false;
+    }
+    myDataTable = $('#myDataTable').DataTable( {
         data: rows,
         columns: head,
         "order": [[ last_n+1, "desc" ]],
+        //"dom": '<"toolbar">frtip',
+        dom: 'Bfrtip',
+        buttons: [
+            { text: 'show '+days_step_size_table+' more days',
+              action: function ( e, dt, node, config ) {
+                table_last_n_days += days_step_size_table; drawDataTable();
+              },
+            },
+            { text: 'show '+days_step_size_table+' less days',
+              action: function ( e, dt, node, config ) {
+                if (table_last_n_days<4) return;
+                table_last_n_days -= days_step_size_table; drawDataTable();
+              },
+            },
+        ],
     } );
-
-    $('#myDataTable tbody').on( 'click', 'tr', function () {
-        $(this).toggleClass('selected');
-    } );
+    if (firstTime) {
+        $('#myDataTable tbody').on( 'click', 'tr', function () {
+            $(this).toggleClass('selected');
+        } );
+    }
 }
 var RawData;
 function processData(allText) {
@@ -140,7 +205,7 @@ function processData(allText) {
         var date = data[idx["Datum"]];
         var aantal = data[idx["Aantal"]];
         var gnaam = data[idx["Gemeentenaam"]];
-        if (date && gnaam && aantal!=null && date > "2020-07-01" ) {
+        if (date && gnaam && aantal!=null ) {
             if (!gemeenteDateAantals[gnaam]) gemeenteDateAantals[gnaam] = {};
             gemeenteDateAantals[gnaam][date] = aantal;
             datesMap[date] = 1;
@@ -157,7 +222,7 @@ function processData(allText) {
     }
     RawData = { dates: dates, gemeenteDateAantals: gemeenteDateAantals, };
     
-    drawDataTable(dates, gemeenteDateAantals);
+    drawDataTable();
 }
 function loadRawData() {
     if (RawData) {  return; }
@@ -176,9 +241,23 @@ function loadRawData() {
 $(function(){
     loadRawData();
 });
-$('button#plot_for_selected_rows').on('click', function() {
-    drawChart(RawData.dates, RawData.gemeenteDateAantals); 
+
+$('#plot_for_selected_rows').on('click', function(){ drawChart() });
+$('#show_more_in_graph_week').on('click', function(){
+    graph_last_n_days += 7; drawChart()
 });
+$('#show_more_in_graph_month').on('click', function(){
+    graph_last_n_days += 31; drawChart()
+});
+$('#show_less_in_graph_week').on('click', function(){
+    if ( graph_last_n_days < 8 ) return false;
+    graph_last_n_days -= 7; drawChart()
+});
+$('#show_less_in_graph_month').on('click', function(){
+    if ( graph_last_n_days < 32 ) return false;
+    graph_last_n_days -= 31; drawChart()
+});
+
 $('button#clear_selection').on('click', function() {
     $("#myDataTable").DataTable().rows('.selected').nodes().to$().removeClass('selected');
 });
