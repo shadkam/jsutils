@@ -32,12 +32,12 @@ body {
 </DIV>
 
 <DIV style="margin-top:.5em; padding-top:0.3em; border-top:solid darkgrey .2em;">
-<div align=center>
+<div align=center style="margin-top:2em;">
     <button id="show_less_in_graph_month">one less month</button>
     &nbsp;
     <button id="show_less_in_graph_week">one less week</button>
-    &nbsp;
-    <button id="plot_for_selected_rows" style="color:blue;">plot for the selected rows</button>
+    &nbsp; <button id="plot_for_above_rows" style="color:blue;">plot for the rows visble above</button>
+    &nbsp; <button id="plot_for_selected_rows" style="color:blue;">plot for the selected rows</button>
     &nbsp;
     <button id="show_more_in_graph_week">one more week</button>
     &nbsp;
@@ -51,10 +51,14 @@ body {
     to plot a timeseries graph, please select desired rows from
     above table, and press the button "plot for the selected rows"
 </div>
-<div class="chart-container"
+<TABLE ALIGN=center border=0>
+<TR><TD>
+  <div class="chart-container"
     style="position: relative; height:30vh; width:80vw;">
     <canvas id="myChart01" ></canvas>
-</div>
+  </div>
+</TD></TR>
+</TABLE>
 </DIV>
 
 <script type="text/javascript">//<![CDATA[
@@ -73,7 +77,7 @@ function getRandomColor() {
 }
 var days_step_size_table = 3;
 var table_last_n_days = 14;
-var graph_last_n_days = 30;
+var graph_last_n_days = 14;
 var days_step_size_graph = 7;
 var color = Chart.helpers.color;
 var myChart;
@@ -88,19 +92,39 @@ function drawChart(){
     }
     dates = dates_new;
 
-    var showGemeentesCount = 0;
-    var showGemeentes = {};
-    $('#myDataTable').DataTable().rows('.selected').data().each(function(e,i){
-        showGemeentes[e[0]] = 1
-        showGemeentesCount++;
+    var gnaam_totals = {};
+    for (var gnaam in gemeenteDateAantals) {
+        gnaam_totals[gnaam] = 0;
+        for (var i=0; i<dates.length; i++) {
+            gnaam_totals[gnaam] += gemeenteDateAantals[gnaam][dates[i]];
+        }
+    }
+    var sorted_gnaams = Object.keys(gnaam_totals).sort(function order(key1, key2){ 
+        var n1 = 1*gnaam_totals[key1];
+        var n2 = 1*gnaam_totals[key2];
+        return n2-n1;
     });
-    if ( !showGemeentesCount ) { alert('nothing selected'); return }
-    $('#plot_msg_hint').hide(); // we are plotting it
 
+    var showGemeentes = {};
+    if ( RawData.showCurrentDbPage ) {
+        $('#myDataTable').DataTable().rows({ page:'current' }).every(function(){
+            showGemeentes[ this.data()[0] ] = 1;
+        });
+        // for (i=0;i<10;i++) { showGemeentes[ sorted_gnaams[i] ] = 1 }
+    } else {
+        var showGemeentesCount = 0;
+        $('#myDataTable').DataTable().rows('.selected').data().each(function(e,i){
+            showGemeentes[e[0]] = 1
+            showGemeentesCount++;
+        });
+        if ( !showGemeentesCount ) { alert('nothing selected'); return }
+    }
+    $('#plot_msg_hint').hide(); // we are plotting it
     var ds0 = [];
     var colorIdx = 0;
-    for (var gnaam in gemeenteDateAantals) {
-        if (!showGemeentes[gnaam]) continue;
+    for (var ii=0; ii<sorted_gnaams.length; ii++) {
+        var gnaam = sorted_gnaams[ii];
+        if ( !showGemeentes[gnaam] ) continue;
         var tmp = [];
         for (var i=0; i<dates.length; i++) {
             tmp.push(gemeenteDateAantals[gnaam][dates[i]]);
@@ -229,9 +253,13 @@ function processData(allText) {
             gemeenteDateAantals[g][date] = delta;
         });
     }
-    RawData = { dates: dates, gemeenteDateAantals: gemeenteDateAantals, };
-    
+    RawData = {
+        dates: dates,
+        gemeenteDateAantals: gemeenteDateAantals,
+        showCurrentDbPage: true,
+    };
     drawDataTable();
+    drawChart();
 }
 function loadRawData() {
     if (RawData) {  return; }
@@ -251,7 +279,8 @@ $(function(){
     loadRawData();
 });
 
-$('#plot_for_selected_rows').on('click', function(){ drawChart() });
+$('#plot_for_above_rows').on('click', function(){ RawData.showCurrentDbPage=true; drawChart() });
+$('#plot_for_selected_rows').on('click', function(){ RawData.showCurrentDbPage=false; drawChart() });
 $('#show_more_in_graph_week').on('click', function(){
     graph_last_n_days += 7; drawChart()
 });
