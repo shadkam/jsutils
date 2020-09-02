@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Json Viewer</title>
+</head>
+<script type="text/javascript" src="//code.jquery.com/jquery-2.1.3.js"></script>
+<body bgcolor="darkgrey">
+<table border=1 cellspacing="0" cellpadding="3" width="100%" align="center">
+    <tr vAlign=top>
+        <td width="50%" align=center>
+            <button onClick="showPrettyJson()">show</button>
+            <br>
+            <TextArea id="jsonStr" rows=20 cols=50 placeholder="paste json str here and press the above button">
+</TextArea>
+        </td>
+        <td>
+            <pre id="result"></pre>
+        </td>
+    </tr>
+</table>
+</body>
+<script>
+function showPrettyJson() {
+    var obj = JSON.parse($('#jsonStr').val());
+    var str = JSON.stringify(obj, null, 2);
+    $('#result').text(str);
+}
+</script>
+</html>
