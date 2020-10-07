@@ -7,6 +7,10 @@ body {
     margin: 0;
     padding: 0;
 }
+.chart_container {
+  position: relative;
+  width: 80vw;
+}
 </style>
 
 <script type="text/javascript" src="//code.jquery.com/jquery-2.1.3.js"></script>
@@ -53,15 +57,30 @@ body {
 </div>
 <TABLE ALIGN=center border=0>
 <TR><TD>
-  <div class="chart-container"
-    style="position: relative; height:30vh; width:80vw;">
+  <div class="chart_container">
     <canvas id="myChart01" ></canvas>
+  </div>
+</TD></TR>
+<TR><TD>
+  <div class="chart_container" >
+    <canvas id="myChart02" ></canvas>
   </div>
 </TD></TR>
 </TABLE>
 </DIV>
 
 <script type="text/javascript">//<![CDATA[
+var MMM = "LastDec JAN FEB MAR APR MAY JUN JUL AUG SEP OCT NOV DEC".split(" ");
+function chartDateDisp(d){
+    return MMM[1*d.substring(5,7)]+"-"+d.substring(8);
+}
+function myMap(arr,callback) {
+    var ret = [];
+    arr.forEach(function(e){
+        ret.push(callback(e));
+    });
+    return ret;
+}
 var chartColorArr = [
     '#0000FF', '#00FF00', '#FF0000',
     '#FF00FF', '#00FFFF',
@@ -81,6 +100,7 @@ var graph_last_n_days = 31;
 var days_step_size_graph = 7;
 var color = Chart.helpers.color;
 var myChart;
+var myChart02;
 function drawChart(){
     var dates = RawData.dates,
         gemeenteDateAantals = RawData.gemeenteDateAantals;
@@ -93,10 +113,13 @@ function drawChart(){
     dates = dates_new;
 
     var gnaam_totals = {};
+    var date_totals = {};
     for (var gnaam in gemeenteDateAantals) {
         gnaam_totals[gnaam] = 0;
         for (var i=0; i<dates.length; i++) {
             gnaam_totals[gnaam] += gemeenteDateAantals[gnaam][dates[i]];
+            if (!date_totals[dates[i]]) date_totals[dates[i]] = 0;
+            date_totals[dates[i]] += gemeenteDateAantals[gnaam][dates[i]];
         }
     }
     var sorted_gnaams = Object.keys(gnaam_totals).sort(function order(key1, key2){ 
@@ -104,6 +127,12 @@ function drawChart(){
         var n2 = 1*gnaam_totals[key2];
         return n2-n1;
     });
+    var sorted_dates = Object.keys(date_totals).sort();
+    var sorted_date_totals = [];
+    sorted_dates.forEach(function(date){
+            var total = date_totals[date];
+            sorted_date_totals.push(total);
+        });
 
     var showGemeentes = {};
     if ( RawData.showCurrentDbPage ) {
@@ -139,7 +168,7 @@ function drawChart(){
     myChart = new Chart(document.getElementById("myChart01"), {
       type: 'line',
       data: {
-        labels: dates,
+        labels: myMap(dates, chartDateDisp),
         datasets: ds0,
         },
         options: {
@@ -158,6 +187,21 @@ function drawChart(){
                 }]
             }
         }
+    });
+    if (myChart02) myChart02.destroy();
+    myChart02 = new Chart(document.getElementById("myChart02"), {
+      type: 'bar',
+      data: {
+          labels: myMap(sorted_dates, function(d){
+              return chartDateDisp(d);
+            }),
+          datasets: [{
+            label: "NL Total",
+            data: sorted_date_totals,
+            backgroundColor: chartColorArr[0],
+            borderColor: chartColorArr[0],
+          }],
+        },
     });
 }
 var myDataTable;
@@ -312,6 +356,7 @@ var pageTracker = _gat._getTracker("UA-3502216-4");
 pageTracker._trackPageview();
 } catch(err) {}</script>
 <!-- GOOGLE ANALYTICS -->
+
 
 </body>
 </html>
