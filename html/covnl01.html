@@ -70,6 +70,97 @@ body {
 </DIV>
 
 <script type="text/javascript">//<![CDATA[
+var NL_POP = [
+// below array based on 
+// https://opendata.cbs.nl/statline/#/CBS/nl/dataset/70072ned/table?dl=3B993&ts=1603548252521
+// (with thanks) - copied from the site on OCT-24
+// there may have been errors in copying / spelling 
+// the intent is to help - no guarantee of any data accuracy or anything
+// NOT TO BE CONSIDERED RELIABLE
+//
+['Aa en Hunze',25445,92], ['Aalsmeer',31859,1584], ['Aalten',27121,281], ['Achtkarspelen',27843,272], ['Alblasserdam',20165,2297],
+['Albrandswaard',25590,1180], ['Alkmaar',109436,991], ['Almelo',73107,1087], ['Almere',211893,1640], ['Alphen aan den Rijn',111897,886],
+['Alphen-Chaam',10203,110], ['Altena',55967,279], ['Ameland',3716,63], ['Amersfoort',157276,2512], ['Amstelveen',91675,2229],
+['Amsterdam',872757,5273], ['Apeldoorn',163818,482], ['Appingedam',11642,490], ['Arnhem',161348,1649], ['Assen',68599,838],
+['Asten',16721,238], ['Baarle-Nassau',6859,90], ['Baarn',24868,764], ['Barendrecht',48714,2467], ['Barneveld',59082,336],
+['Beek',15865,754], ['Beekdaelen',35938,459], ['Beemster',10022,142], ['Beesel',13482,482], ['Berg en Dal',34992,405],
+['Bergeijk',18635,184], ['Bergen (L.)',13085,127], ['Bergen (NH.)',29839,302], ['Bergen op Zoom',67496,844], ['Berkelland',43747,170],
+['Bernheze',31240,348], ['Best',29988,874], ['Beuningen',25890,593], ['Beverwijk',41626,2262], ['De Bilt',43137,652],
+['Bladel',20390,271], ['Blaricum',11540,1038], ['Bloemendaal',23571,592], ['Bodegraven-Reeuwijk',34872,463], ['Boekel',10785,313],
+['Borger-Odoorn',25559,93], ['Borne',23312,897], ['Borsele',22739,161], ['Boxmeer',29365,263], ['Boxtel',30801,483],
+['Breda',184069,1464], ['Brielle',17271,627], ['Bronckhorst',36055,127], ['Brummen',20726,248], ['Brunssum',27821,1613],
+['Bunnik',15191,411], ['Bunschoten',21866,720], ['Buren',26749,200], ['Capelle aan den IJssel',67122,4747], ['Castricum',35986,724],
+['Coevorden',35297,119], ['Cranendonck',21138,277], ['Cuijk',25130,491], ['Culemborg',28955,989], ['Dalfsen',28587,173],
+['Dantumadiel',18922,224], ['Delft',103595,4573], ['Delfzijl',24678,185], ['Deurne',32471,278], ['Deventer',100719,771],
+['Diemen',30780,2566], ['Dinkelland',26461,151], ['Doesburg',11077,961], ['Doetinchem',58001,734], ['Dongen',26222,897],
+['Dordrecht',119284,1519], ['Drechterland',19719,335], ['Drimmelen',27272,287], ['Dronten',41555,125], ['Druten',18926,503],
+['Duiven',25126,741], ['Echt-Susteren',31610,307], ['Edam-Volendam',36197,666], ['Ede',117165,368], ['Eemnes',9247,298],
+['Eersel',19313,234], ['Eijsden-Margraten',25768,332], ['Eindhoven',234394,2674], ['Elburg',23161,363], ['Emmen',107048,319],
+['Enkhuizen',18591,1466], ['Enschede',159640,1134], ['Epe',33178,213], ['Ermelo',27008,315], ['Etten-Leur',43878,793],
+['De Fryske Marren',51564,147], ['Geertruidenberg',21544,809], ['Geldrop-Mierlo',39726,1281], ['Gemert-Bakel',30723,252], ['Gennep',16921,355],
+['Gilze en Rijen',26431,404], ['Goeree-Overflakkee',50049,192], ['Goes',38082,411], ['Goirle',23904,556], ['Gooise Meren',58055,1396],
+['Gorinchem',37022,1966], ['Gouda',73427,4449], ['Grave',12436,457], ["'s-Gravenhage",545838,6620], ['Groningen',232874,1255],
+['Gulpen-Wittem',14171,194], ['Haaksbergen',24311,232], ['Haaren',14370,249], ['Haarlem',162902,5585], ['Haarlemmermeer',156002,790],
+['Halderberge',30284,407], ['Hardenberg',60948,195], ['Harderwijk',48414,1245], ['Hardinxveld-Giessendam',18295,1082], ['Harlingen',15722,630],
+['Hattem',12209,529], ['Heemskerk',39182,1433], ['Heemstede',27234,2968], ['Heerde',18589,236], ['Heerenveen',50493,266],
+['Heerhugowaard',57587,1507], ['Heerlen',87086,1938], ['Heeze-Leende',16152,155], ['Heiloo',23968,1282], ['Den Helder',56296,1244],
+['Hellendoorn',35916,260], ['Hellevoetsluis',40142,977], ['Helmond',92423,1738], ['Hendrik-Ido-Ambacht',31202,2940], ['Hengelo',81140,1334],
+["'s-Hertogenbosch",155111,1410], ['Heumen',16454,414], ['Heusden',44692,567], ['Hillegom',22209,1725], ['Hilvarenbeek',15518,164],
+['Hilversum',90831,1991], ['Hoeksche Waard',87401,325], ['Hof van Twente',35017,165], ['Het Hogeland',47801,99], ['Hollands Kroon',48432,136],
+['Hoogeveen',55699,437], ['Hoorn',73261,3595], ['Horst aan de Maas',42429,225], ['Houten',50146,913], ['Huizen',41273,2611],
+['Hulst',27556,137], ['IJsselstein',34109,1619], ['Kaag en Braassem',27297,432], ['Kampen',54319,382], ['Kapelle',12695,342],
+['Katwijk',65753,2657], ['Kerkrade',45749,2088], ['Koggenland',22749,283], ['Krimpen aan den IJssel',29526,3841], ['Krimpenerwaard',56319,380],
+['Laarbeek',22523,407], ['Landerd',15730,224], ['Landgraaf',37445,1523], ['Landsmeer',11491,510], ['Langedijk',28163,1179],
+['Lansingerland',62384,1168], ['Laren',11280,909], ['Leeuwarden',124084,521], ['Leiden',125099,5710], ['Leiderdorp',27056,2337],
+['Leidschendam-Voorburg',76534,2351], ['Lelystad',78598,341], ['Leudal',35879,220], ['Leusden',30401,519], ['Lingewaard',46601,752],
+['Lisse',22955,1463], ['Lochem',33729,158], ['Loon op Zand',23408,469], ['Lopik',14467,191], ['Loppersum',9537,86],
+['Losser',22683,230], ['Maasdriel',25030,379], ['Maasgouw',23965,524], ['Maassluis',33213,3918], ['Maastricht',121575,2172],
+['Medemblik',45101,371], ['Meerssen',18828,698], ['Meierijstad',81194,441], ['Meppel',33920,611], ['Middelburg',48822,1008],
+['Midden-Delfland',19341,410], ['Midden-Drenthe',33185,97], ['Midden-Groningen',60797,217], ['Mill en Sint Hubert',10939,209], ['Moerdijk',37129,233],
+['Molenlanden',43909,242], ['Montferland',36011,341], ['Montfoort',13917,370], ['Mook en Middelaar',7847,451], ['Neder-Betuwe',24339,406],
+['Nederweert',17019,170], ['Nieuwegein',63462,2700], ['Nieuwkoop',28811,369], ['Nijkerk',43171,623], ['Nijmegen',177659,3346],
+['Nissewaard',85219,1158],
+['Noardeast-Fryslân',45228,120],
+['Noardeast-FryslÃ¢n',45228,120],
+['Noord-Beveland',7392,86], ['Noordenveld',31253,157], ['Noordoostpolder',47291,103],
+['Noordwijk',43508,745], ['Nunspeet',27851,216], ['Oegstgeest',24840,3399], ['Oirschot',18714,184], ['Oisterwijk',26245,411],
+['Oldambt',38209,169], ['Oldebroek',23646,242], ['Oldenzaal',31836,1477], ['Olst-Wijhe',18252,160], ['Ommen',18009,100],
+['Oost Gelre',29627,270], ['Oosterhout',55982,783], ['Ooststellingwerf',25469,114], ['Oostzaan',9735,845], ['Opmeer',11836,285],
+['Opsterland',29733,132], ['Oss',91915,563], ['Oude IJsselstreek',39388,289], ['Ouder-Amstel',14026,583], ['Oudewater',10230,263],
+['Overbetuwe',47906,439], ['Papendrecht',32136,3414], ['Peel en Maas',43425,272], ['Pekela',12196,249], ['Pijnacker-Nootdorp',55308,1491],
+['Purmerend',81249,3509], ['Putten',24112,283], ['Raalte',37712,221], ['Reimerswaal',22730,223], ['Renkum',31419,684],
+['Renswoude',5444,296], ['Reusel-De Mierden',13112,168], ['Rheden',43761,535], ['Rhenen',20119,478], ['Ridderkerk',46189,1948],
+['Rijssen-Holten',38177,406], ['Rijswijk',54450,3901], ['Roerdalen',20574,233], ['Roermond',58260,958], ['De Ronde Venen',44456,445],
+['Roosendaal',77251,725], ['Rotterdam',651157,2993], ['Rozendaal',1704,61], ['Rucphen',22878,355], ['Schagen',46483,276],
+['Scherpenzeel',9880,717], ['Schiedam',78730,4417], ['Schiermonnikoog',947,23], ['Schouwen-Duiveland',33839,147], ['Simpelveld',10555,658],
+['Sint Anthonis',11664,117], ['Sint-Michielsgestel',29208,500], ['Sittard-Geleen',92429,1170], ['Sliedrecht',25220,1965], ['Sluis',23210,83],
+['Smallingerland',56150,479], ['Soest',46606,1008], ['Someren',19368,241], ['Son en Breugel',17322,667], ['Stadskanaal',31686,269],
+['Staphorst',17145,128], ['Stede Broec',21726,1498], ['Steenbergen',24416,167], ['Steenwijkerland',44126,153], ['Stein',25007,1186],
+['Stichtse Vecht',64931,676],
+['Súdwest-Fryslân',89987,172],
+['SÃºdwest-FryslÃ¢n',89987,172],
+['Terneuzen',54426,217], ['Terschelling',4888,57], ['Texel',13575,84],
+['Teylingen',37440,1319], ['Tholen',25757,176], ['Tiel',42159,1282], ['Tilburg',219789,1892], ['Tubbergen',21275,145],
+['Twenterand',33743,318], ['Tynaarlo',33887,237], ['Tytsjerksteradiel',32052,215], ['Uden',42119,629], ['Uitgeest',13666,713],
+['Uithoorn',29478,1625], ['Urk',21031,1599], ['Utrecht',357597,3811], ['Utrechtse Heuvelrug',49580,376], ['Vaals',10105,423],
+['Valkenburg aan de Geul',16367,446], ['Valkenswaard',31193,568], ['Veendam',27384,360], ['Veenendaal',66493,3417], ['Veere',21880,165],
+['Veldhoven',45466,1435], ['Velsen',68648,1519], ['Venlo',101802,819], ['Venray',43614,267], ['Vijfheerenlanden',56811,388],
+['Vlaardingen',73397,3114], ['Vlieland',1155,30], ['Vlissingen',44360,1293], ['Voerendaal',12475,396], ['Voorschoten',25596,2297],
+['Voorst',24552,200], ['Vught',26558,787], ['Waadhoeke',46090,162], ['Waalre',17456,780], ['Waalwijk',48637,753],
+['Waddinxveen',29291,1055], ['Wageningen',39664,1304], ['Wassenaar',26305,515], ['Waterland',17424,334], ['Weert',50105,480],
+['Weesp',19738,866], ['West Betuwe',51128,237], ['West Maas en Waal',19324,252], ['Westerkwartier',63329,175], ['Westerveld',19460,70],
+['Westervoort',14971,2130], ['Westerwolde',25733,93], ['Westland',110375,1358], ['Weststellingwerf',25914,118], ['Westvoorne',14731,277],
+['Wierden',24446,258], ['Wijchen',41110,621], ['Wijdemeren',24358,512], ['Wijk bij Duurstede',23914,502], ['Winterswijk',28854,209],
+['Woensdrecht',21876,239], ['Woerden',52299,590], ['De Wolden',24330,108], ['Wormerland',16270,422], ['Woudenberg',13362,366],
+['Zaanstad',156794,2123], ['Zaltbommel',28881,364], ['Zandvoort',17116,533], ['Zeewolde',22653,92], ['Zeist',64905,1338],
+['Zevenaar',43750,472], ['Zoetermeer',125285,3637], ['Zoeterwoude',8605,406], ['Zuidplas',43885,756], ['Zundert',21829,181],
+['Zutphen',47934,1170], ['Zwartewaterland',22685,275], ['Zwijndrecht',44737,2204], ['Zwolle',128840,1160],
+];
+var gPop = {};
+NL_POP.forEach(function(e){
+    gPop[e[0]] = e[1];
+});
+console.dir(gPop);
 var MMM = "LastDec JAN FEB MAR APR MAY JUN JUL AUG SEP OCT NOV DEC".split(" ");
 function chartDateDisp(d){
     return MMM[1*d.substring(5,7)]+"-"+d.substring(8);
@@ -213,6 +304,9 @@ function drawDataTable(dates, gemeenteDateAantals){
     var dateBegIdx = dates.length<last_n?0:dates.length-last_n;
     var rows = [];
     for (var gnaam in gemeenteDateAantals) {
+        //if (!gPop[gnaam]) {
+        //  alert("no-entry-for "+gnaam);
+        //}
         var row = [ gnaam ];
         var sum = 0;
         for (var i=dateBegIdx; i<dates.length; i++) {
@@ -221,6 +315,8 @@ function drawDataTable(dates, gemeenteDateAantals){
             sum += 1*num;
         }
         row.push(sum);
+        row.push( gPop[gnaam] ? (1000*(sum/gPop[gnaam])).toFixed(3) : '-' );
+        row.push( gPop[gnaam] ? gPop[gnaam] : '-' );
         rows.push(row);
     }
     var head = [ { title: 'Gemeente' } ];
@@ -228,6 +324,8 @@ function drawDataTable(dates, gemeenteDateAantals){
         head.push({ title: dates[i].substr(5) });
     }
     head.push({ title: 'sum (last '+last_n+' days)' });
+    head.push({ title: '' });
+    head.push({ title: '' });
 
     var firstTime = true;
     if ( $.fn.DataTable.isDataTable('#myDataTable') ) {
