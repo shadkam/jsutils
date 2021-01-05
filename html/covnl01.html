@@ -293,6 +293,9 @@ function drawChart(){
             borderColor: chartColorArr[0],
           }],
         },
+      options: { scales: { yAxes: [{
+          ticks: { beginAtZero: true },
+      }]}},
     });
 }
 var myDataTable;
