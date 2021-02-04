@@ -1,3 +1,4 @@
+
 <html>
 <head>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
@@ -187,13 +188,14 @@ function getRandomColor() {
 }
 var days_step_size_table = 3;
 var table_last_n_days = 14;
-var graph_last_n_days = 31;
+var graph_last_n_days = 31*2;
 var days_step_size_graph = 7;
 var color = Chart.helpers.color;
 var myChart;
 var myChart02;
 function drawChart(){
     var dates = RawData.dates,
+        dateAantals = RawData.dateAantals;
         gemeenteDateAantals = RawData.gemeenteDateAantals;
     var last_n = graph_last_n_days;
     var dateBegIdx = dates.length<last_n?0:dates.length-last_n;
@@ -209,8 +211,7 @@ function drawChart(){
         gnaam_totals[gnaam] = 0;
         for (var i=0; i<dates.length; i++) {
             gnaam_totals[gnaam] += gemeenteDateAantals[gnaam][dates[i]];
-            if (!date_totals[dates[i]]) date_totals[dates[i]] = 0;
-            date_totals[dates[i]] += gemeenteDateAantals[gnaam][dates[i]];
+            date_totals[dates[i]] = dateAantals[dates[i]];
         }
     }
     var sorted_gnaams = Object.keys(gnaam_totals).sort(function order(key1, key2){ 
@@ -374,6 +375,7 @@ function processData(allText) {
         if (headers[i]==='Type') weHaveType = true;
     }
     var gemeenteDateAantals = {};
+    var dateAantals = {};
     var datesMap = {};
     for (var i=1; i<allTextLines.length; i++) {
         var data = allTextLines[i].split(',');
@@ -382,6 +384,10 @@ function processData(allText) {
         if (weHaveType && Type!=="Totaal") continue;
         var date = data[idx["Datum"]];
         var aantal = data[idx["Aantal"]];
+        if (date) {
+            if (!dateAantals[date]) dateAantals[date] = 0;
+            dateAantals[date] += 1*aantal;
+        }
         var gnaam = data[idx["Gemeentenaam"]];
         if (date && gnaam && aantal!=null ) {
             if (!gemeenteDateAantals[gnaam]) gemeenteDateAantals[gnaam] = {};
@@ -398,9 +404,18 @@ function processData(allText) {
             gemeenteDateAantals[g][date] = delta;
         });
     }
+    if (true) {
+        var prev = dateAantals[dates[0]];
+        dates.forEach(function(date){
+            var delta = dateAantals[date]-prev;
+            prev = dateAantals[date];
+            dateAantals[date] = delta;
+        });
+    }
     RawData = {
         dates: dates,
         gemeenteDateAantals: gemeenteDateAantals,
+        dateAantals: dateAantals,
         showCurrentDbPage: true,
     };
     drawDataTable();
