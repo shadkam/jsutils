@@ -105,9 +105,9 @@ function sayText(txt) {
   //   }
   // });
 
-  msg.rate = 0.5;
+  msg.rate = 1;
   msg.volume = 20;
-  msg.lang = "ar-SA";
+  msg.lang = "en-us";
   // alert('i m here ' + txt);
   window.speechSynthesis.speak(msg);
 }
@@ -119,8 +119,8 @@ var MAX = 20,
 
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
-if (urlParams['MAX']) {
-    MAX = urlParams['MAX'];
+if (urlParams.get('MAX')) {
+    MAX = urlParams.get('MAX');
 }
 
 function randomInteger(max) {
@@ -157,6 +157,7 @@ function re_init_page() {
     );
   });
   $('#ans').show();
+  const start = Date.now();
   $('.ans').on('click', function(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -165,12 +166,12 @@ function re_init_page() {
     if (youPicked === RESULT) {
       $('#next_question').show();
       YOK_count++;
-      sayText('Your answer is correct. ' + rand1 + ' plus ' + rand2 + ' is ' + RESULT
-          + '. your score is now ' + YOK_count);
+      const end = Date.now();
+      sayText(RESULT + ' is correct. took '+Math.floor((end-start)/1000)+' seconds');
       $('.ans').hide();
     } else {
       $('#next_question').hide();
-      sayText('oops. ' + RESULT + ' is not correct. please try again');
+      sayText(youPicked + ' is not correct');
       NOK_count++;
     }
 
@@ -180,7 +181,7 @@ function re_init_page() {
     $('#YOK_count').text(YOK_count);
     $('#NOK_count').text(NOK_count);
   });
-  sayText('what is ' + rand1 + ' plus ' + rand2);
+  sayText('' + rand1 + ' plus ' + rand2 + ' is?');
 }
 
 re_init_page();
