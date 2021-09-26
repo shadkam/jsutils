@@ -10,7 +10,7 @@
 </script>
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <meta name=”viewport” content=”width=device-width, initial-scale=1″>
+  <meta name=”viewport” content=”width=device-width, initial-scale=1">
 <style>
 div,td,span,button {
   font-size: 5vw;
@@ -95,11 +95,33 @@ td {
 
 
 <script>
+function sayText(txt) {
+  var msg = new SpeechSynthesisUtterance(txt);
+
+  // window.speechSynthesis.getVoices().some((voice) => {
+  //   if (voice.name === "Maged") {
+  //     msg.voice = voice;
+  //     return true;
+  //   }
+  // });
+
+  msg.rate = 0.5;
+  msg.volume = 20;
+  msg.lang = "ar-SA";
+  // alert('i m here ' + txt);
+  window.speechSynthesis.speak(msg);
+}
 $(function(){
 
-var MAX = 50,
+var MAX = 20,
   YOK_count = 0,
   NOK_count = 0;
+
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+if (urlParams['MAX']) {
+    MAX = urlParams['MAX'];
+}
 
 function randomInteger(max) {
   return 1 + Math.floor(Math.random() * Math.floor(max))
@@ -143,9 +165,12 @@ function re_init_page() {
     if (youPicked === RESULT) {
       $('#next_question').show();
       YOK_count++;
+      sayText('Your answer is correct. ' + rand1 + ' plus ' + rand2 + ' is ' + RESULT
+          + '. your score is now ' + YOK_count);
       $('.ans').hide();
     } else {
       $('#next_question').hide();
+      sayText('oops. ' + RESULT + ' is not correct. please try again');
       NOK_count++;
     }
 
@@ -155,6 +180,7 @@ function re_init_page() {
     $('#YOK_count').text(YOK_count);
     $('#NOK_count').text(NOK_count);
   });
+  sayText('what is ' + rand1 + ' plus ' + rand2);
 }
 
 re_init_page();
