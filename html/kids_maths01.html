@@ -88,6 +88,11 @@ td {
         <span class=result_summary id=NOK_count>0</span>
       </td>
     </tr>
+    <tr>
+      <td colspan=3>
+        <pre id=times style="margin:0;margin-top:1em;font-size:2vw;text-align:right;"></pre>
+      </td>
+    </tr>
   </Table>
 
 </div>
@@ -167,8 +172,9 @@ function re_init_page() {
     if (youPicked === RESULT) {
       $('#next_question').show();
       YOK_count++;
-      const end = Date.now();
-      sayText(RESULT + ' is correct. took '+Math.floor((end-start)/1000)+' seconds');
+      const secsTaken = Math.floor((Date.now()-start)/1000);
+      sayText(RESULT + ' is correct. Took '+secsTaken+' seconds');
+      $('#times').append("\n"+rand1+' + '+rand2+' ... '+secsTaken+' seconds');
       $('.ans').hide();
     } else {
       $('#next_question').hide();
