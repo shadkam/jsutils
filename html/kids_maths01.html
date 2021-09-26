@@ -109,6 +109,7 @@ function sayText(txt) {
   msg.volume = 20;
   msg.lang = "en-us";
   // alert('i m here ' + txt);
+  window.speechSynthesis.cancel();
   window.speechSynthesis.speak(msg);
 }
 $(function(){
