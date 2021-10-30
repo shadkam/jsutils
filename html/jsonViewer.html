@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -10,6 +9,7 @@
     <tr vAlign=top>
         <td width="50%" align=center>
             <button onClick="showPrettyJson()">show</button>
+            <button onClick="showPrettyJsonAsTable()">showAsTable</button>
             <br>
             <TextArea id="jsonStr" rows=20 cols=50 placeholder="paste json str here and press the above button">
 </TextArea>
@@ -19,12 +19,43 @@
         </td>
     </tr>
 </table>
+<div id="resultAsTable">
+</div>
 </body>
 <script>
+function myMap(arr,callback) {
+    var ret = [];
+    arr.forEach(function(e){
+        ret.push(callback(e));
+    });
+    return ret;
+}
 function showPrettyJson() {
     var obj = JSON.parse($('#jsonStr').val());
     var str = JSON.stringify(obj, null, 2);
     $('#result').text(str);
+}
+function showPrettyJsonAsTable() {
+    var obj = JSON.parse($('#jsonStr').val());
+    var colsMap = {};
+    for (var i in obj) { for (var j in obj[i]) { colsMap[j] = 1 } }
+    var cols = Object.keys(colsMap);
+    var trs = [];
+    if (true) {
+        trs.push('<tr>'+myMap(cols, function(e){
+            return '<th>'+e+'</th>'}).join("\n")+'</tr>');
+    }
+    for (var i in obj) {
+        var tds = myMap(cols, function(col){
+            return '<td>'+obj[i][col]+'</td>';
+        });
+        trs.push('<tr>'+tds.join("\n")+'</tr>');
+    }
+    $('#resultAsTable').html(
+        '<table cellspacing=0 border=1 bordercolor=black>'
+        +trs.join("\n")
+        +'</table>'
+    );
 }
 </script>
 </html>
