@@ -1,0 +1,201 @@
+<head>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-3502216-4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-3502216-4');
+</script>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <meta name=”viewport” content=”width=device-width, initial-scale=1">
+<style>
+div,td,span,button {
+  font-size: 5vw;
+}
+.ans {
+  margin: .25em;
+}
+td {
+  text-align: center;
+}
+#NOK_count {
+  color: red;
+}
+#YOK_count {
+  color: green;
+}
+.result_summary {
+  font-size: 120%;
+  padding: 0 1em 0 1em;
+  margin: 0 0.25em 0 0.25em;
+  border: solid 2px lightgrey;
+  border-radius: 0.5em;
+}
+@media all and (max-width: 699px) and (min-width: 520px), (min-width: 1151px) {
+   body {
+  }
+}
+</style>
+    <link rel="stylesheet" media="screen" href="//fonts.googleapis.com/css?family=Inconsolata" />
+    <style type="text/css" media="screen">
+    </style>
+</head>
+
+<div>
+  <Table align=center border=0>
+    <tr>
+      <td colspan=3>
+        <span id="num1"></span>
+        <span> x </span>
+        <span id="num2"></span>
+        <span> = </span>
+        <span id="result"> ? </span>
+      </td>
+    </tr>
+    <tr>
+      <td colspan=3 align=center>
+        <table border=0 align=center>
+          <tr>
+            <td><span id="ans0"></span></td>
+            <td><span id="ans1"></span></td>
+            <td><span id="ans2"></span></td>
+            <td><span id="ans3"></span></td>
+          </tr>
+          <tr>
+            <td><span id="ans4"></span></td>
+            <td><span id="ans5"></span></td>
+            <td><span id="ans6"></span></td>
+            <td><span id="ans7"></span></td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <td colspan=3 align=center>
+        <div>
+          <button id=next_question style="margin:1em;">
+            Next Question
+          </button>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td colspan=3 align=center>
+        <span class=result_summary id=YOK_count>0</span>
+        <span class=result_summary id=NOK_count>0</span>
+      </td>
+    </tr>
+    <tr>
+      <td colspan=3>
+        <pre id=times style="margin:0;margin-top:1em;font-size:2vw;text-align:right;"></pre>
+      </td>
+    </tr>
+  </Table>
+
+</div>
+
+
+
+<script>
+function sayText(txt) {
+  var msg = new SpeechSynthesisUtterance(txt);
+
+  // window.speechSynthesis.getVoices().some((voice) => {
+  //   if (voice.name === "Maged") {
+  //     msg.voice = voice;
+  //     return true;
+  //   }
+  // });
+
+  msg.rate = 1;
+  msg.volume = 20;
+  msg.lang = "en-us";
+  // alert('i m here ' + txt);
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(msg);
+}
+$(function(){
+
+var MAX = 10,
+  YOK_count = 0,
+  NOK_count = 0;
+
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+if (urlParams.get('MAX')) {
+    MAX = urlParams.get('MAX');
+}
+
+function randomInteger(max) {
+  return 1 + Math.floor(Math.random() * Math.floor(max))
+}
+
+function re_init_page() {
+  $('#next_question').hide();
+
+  var rand1 = randomInteger(MAX);
+  var rand2 = randomInteger(MAX);
+  $('#num1').text(rand1);
+  $('#num2').text(rand2);
+  $('#result').text(' ? ')
+
+  var RESULT = rand1 * rand2;
+
+  var options = {};
+  options[RESULT] = 1;
+  for (var i = 0; i < 2000; i++) {
+    options[randomInteger(MAX * MAX)] = 1;
+    var size = 0;
+    for (var j in options) {
+      size++
+    };
+    if (size === 8) break;
+  }
+  var sorted = Object.keys(options).sort(function sortNumber(a, b) {
+    return a - b
+  });
+  sorted.forEach(function(elem, i) {
+    $('#ans' + i).html(
+      '<button class="ans" ans="' + elem + '">' + elem + '</button>'
+    );
+  });
+  $('#ans').show();
+  const start = Date.now();
+  $('.ans').on('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var youPicked = $(this).attr('ans') * 1;
+
+    if (youPicked === RESULT) {
+      $('#next_question').show();
+      YOK_count++;
+      const secsTaken = Math.floor((Date.now()-start)/1000);
+      sayText(RESULT + ' is correct');
+      $('#times').append("\n"+rand1+' x '+rand2+' ... '+secsTaken+' seconds');
+      $('.ans').hide();
+    } else {
+      $('#next_question').hide();
+      sayText(youPicked + ' is not correct');
+      NOK_count++;
+    }
+
+    $('#result').text(youPicked).css(
+      'color', youPicked === RESULT ? 'green' : 'red'
+    );
+    $('#YOK_count').text(YOK_count);
+    $('#NOK_count').text(NOK_count);
+  });
+  sayText('' + rand1 + ' times ' + rand2 + ' is?');
+}
+
+re_init_page();
+$('#next_question').on('click', function() {
+  re_init_page();
+});
+
+
+});
+</script>
