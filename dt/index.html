@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="//code.jquery.com/jquery-3.6.3.min.js"></script>
+<style>
+.topbar { background-color:darkblue; padding:1vh; margin:0; color:white; }
+html, body, td { font-size: 2vh; margin:0; padding:0; }
+h3 { font-size: 3vh; }
+.tzDisp { font-size: 3vh; padding:1vh; }
+</style>
+</head>
+<body>
+<h3 class='topbar'>Times in different zones</h2>
+<table align=center>
+  <tr><td><div id="tzDivs"></div></td></tr>
+</table>
+<hr style="margin:0;padding:0;"/>
+<table align=center>
+  <tr><td style='padding:.5vh;'>
+    add more through the url<br>
+    (z=tz1,tz2... partial string should do, eg <a href="?z=ams,lond,york">ams,lond,york</a>)
+  </td></tr>
+</table>
+</body>
+</html>
+<script>
+const userLocale =
+  navigator.languages && navigator.languages.length
+    ? navigator.languages[0]
+    : navigator.language;
+function datetime4tz(tz) {
+    var format_options = {
+	timeZone: tz,
+	hour12: false,
+	year: 'numeric',
+	month: 'short',
+	day: 'numeric',
+	hour: 'numeric',
+	minute: 'numeric'
+    };
+    var formatter = new Intl.DateTimeFormat(userLocale, format_options);
+    return formatter.format(new Date());
+}
+function rebuildTimezonesDiv(zones) {
+    $('#tzDivs').html('');
+    zones.forEach(function(tz){
+        //console.log('tz='+tz);
+        $('#tzDivs').append($('<div>',{class:'tzDisp'}).append('<b>'+tz+'</b><br>'+datetime4tz(tz)));
+    });
+}
+$(document).ready(function() {
+    //console.log('userLocale=' + userLocale);
+    var allTimezonesStrs = Intl.supportedValuesOf('timeZone'); {
+        allTimezonesStrs.push('UTC');
+    }
+    var query_string = window.location.search;
+    if (query_string) query_string = query_string.substring(1);
+    var params = query_string.split('&').reduce(function (res, item) {
+        var parts = item.split('=');
+        res[parts[0]] = parts[1];
+        return res;
+    }, {});
+    //console.dir(params);
+    var localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    var zones = [localTimezone];
+    var ignoredStrs = [];
+    if (params.z) {
+        var zones0 = {};
+        var in_zone_strs_lower = params.z.split(',').map(function(z){return z.toLowerCase() });
+        allTimezonesStrs.forEach(function(intl_tz_str){
+            var intl_tzstr_lower =  intl_tz_str.toLowerCase();
+            in_zone_strs_lower.forEach(function(in_str){
+                if (in_str.length<3) {
+                    ignoredStrs.push([in_str, 'too small .. len should be g.e. 3']);
+                    return;
+                }
+                if (intl_tzstr_lower.match(in_str)) {
+                    zones0[intl_tz_str] = 1;
+                }
+            });
+        });
+        delete zones0[localTimezone];
+        //console.dir(['zones0', zones0]);
+        for (tz in zones0) { zones.push(tz); }
+        //console.dir(['zones', zones]);
+    } else {
+        zones.push('UTC');
+    }
+    rebuildTimezonesDiv(zones);
+});
+</script>
