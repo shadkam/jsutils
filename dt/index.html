@@ -52,6 +52,19 @@ h3 { font-size: 3vh; }
   </td></tr>
 </table>
 
+<hr style="margin:0;padding:0;margin-top:1vh;margin-bottom:1vh;"/>
+<table align=center
+  border=1 cellspacing=0 cellpadding=2
+  bordercolor=darkblue
+  style='border: solid .2vh darkblue;'>
+  <tr><td class='biggerText' bgcolor=darkblue style='color:white;'>datetime to epoch</td></tr>
+  <tr><td align=right class='biggerText'>
+        <input type="datetime-local" id="dt0">
+    <div class='biggerText' id=dt_to_epoch_Result>???</div>
+  </td></tr>
+</table>
+
+<br>
 </body>
 </html>
 
@@ -168,5 +181,14 @@ $(document).ready(function() {
         zones.push('UTC');
     }
     rebuildTimezonesDiv(zones);
+
+    $('#dt0').on('change', function(){
+        var dt = new Date(document.getElementById('dt0').value);
+        if (dt) {
+            var ms = dt.getTime();
+            var secs = Math.floor(ms/1000);
+            $('#dt_to_epoch_Result').text(secs+' seconds');
+        }
+    });
 });
 </script>
