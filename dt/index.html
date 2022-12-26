@@ -4,7 +4,9 @@
 <script src="//code.jquery.com/jquery-3.6.3.min.js"></script>
 <style>
 .topbar { background-color:darkblue; padding:1vh; margin:0; color:white; }
-html, body, td { font-size: 2vh; margin:0; padding:0; }
+.biggerText { font-size: 3vh; }
+input, button { font-size: 3vh; }
+html, body, span, td { font-size: 2vh; margin:0; padding:0; }
 h3 { font-size: 3vh; }
 .tzDisp { font-size: 3vh; padding:1vh; }
 </style>
@@ -21,13 +23,92 @@ h3 { font-size: 3vh; }
     (z=tz1,tz2... partial string should do, eg <a href="?z=ams,lond,york">ams,lond,york</a>)
   </td></tr>
 </table>
+
+<hr style="margin:0;padding:0;margin-bottom:2vh;"/>
+<table align=center
+  border=1 cellspacing=0 cellpadding=2
+  bordercolor=darkblue
+  style='border: solid .2vh darkblue;'>
+  <tr><td class='biggerText' bgcolor=darkblue style='color:white;'>DateDiff</td></tr>
+  <tr><td align=center class='biggerText'>
+        <b>d1</b> <input type=date id=d1>
+    <br><b>d2</b> <input type=date id=d2>
+    <br><button onClick='doDateDiff()'>=</button>
+    <br><span class='biggerText' id=ddResult>???</span>
+  </td></tr>
+</table>
+
+<hr style="margin:0;padding:0;margin-top:1vh;margin-bottom:1vh;"/>
+<table align=center
+  border=1 cellspacing=0 cellpadding=2
+  bordercolor=darkblue
+  style='border: solid .2vh darkblue;'>
+  <tr><td class='biggerText' bgcolor=darkblue style='color:white;'>Add Days to Date</td></tr>
+  <tr><td align=right class='biggerText'>
+        <b>date </b> <input type=date id=d3>
+    <br><b>days_to_add </b> <input type=number id=days_to_add_3 style='width:9vh;'>
+    <br><button onClick='doDateAdd()'>=</button>
+    <br><span class='biggerText' id=dateAddResult>???</span>
+  </td></tr>
+</table>
+
 </body>
 </html>
+
 <script>
+const ONE_DAY_MILLIS = 86400 * 1000;
+const HALF_DAY_MILLIS = ONE_DAY_MILLIS / 2;
 const userLocale =
   navigator.languages && navigator.languages.length
     ? navigator.languages[0]
     : navigator.language;
+function doDateAdd() {
+   var d3 = document.getElementById('d3').valueAsDate;
+   var d3str = formattedDate(d3);
+   var days_to_add = $('#days_to_add_3').val();
+   if (!d3 || !days_to_add) {
+       alert('both date and days_to_add needed');
+   } else {
+       var d3Time = d3.getTime();
+       var resultDate = new Date(d3Time + HALF_DAY_MILLIS + days_to_add * ONE_DAY_MILLIS);
+       $('#dateAddResult').html($('<div>', {class:'biggerText', style: 'text-align:right;'})
+         .append(
+           'date('+d3str+')'+'<br>+ days_to_add('+days_to_add+')'+'<br>= <b>'+formattedDate(resultDate)+'</b>'
+         )
+       );
+   }
+}
+function doDateDiff() {
+   $('#ddResult').text('');
+   var d1 = document.getElementById('d1').valueAsDate;
+   var d2 = document.getElementById('d2').valueAsDate;
+   if (!d1 || !d2) {
+       alert('both d1 and d2 needed');
+   } else {
+       var d1str = 'd1('+$('#d1').val()+')',
+           d2str = 'd2('+$('#d2').val()+')';
+       var d1Time = d1.getTime(), d2Time = d2.getTime();
+       var bigger  = d1Time>=d2Time?d1str:d2str,
+           smaller = d1Time>=d2Time?d2str:d1str,
+           ddiff   = d1Time>=d2Time?d1Time-d2Time:d2Time-d1Time;
+       ddiff = Math.floor(ddiff/(86400*1000));
+       $('#ddResult').html($('<div>', {class:'biggerText', style: 'text-align:right;'})
+         .append(
+           ''+bigger+'<br>- '+smaller+'<br>= <b>'+ddiff+' days</b>'
+         )
+       );
+   }
+}
+function formattedDate(dtObj) {
+    var format_options = {
+        //weekday: "short",
+        year: "numeric",
+        month: "short",
+        day: "numeric"
+    };
+    var formatter = new Intl.DateTimeFormat(userLocale, format_options);
+    return formatter.format(dtObj);
+}
 function datetime4tz(tz) {
     var format_options = {
 	timeZone: tz,
