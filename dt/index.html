@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta name="viewport" content="width=device-width, height=device-height initial-scale=1">
 <script src="//code.jquery.com/jquery-3.6.3.min.js"></script>
 <style>
+html, body { margin:0; padding:0; }
 .topbar { background-color:darkblue; padding:1vh; margin:0; color:white; }
-.biggerText { font-size: 3vh; }
-input, button { font-size: 3vh; }
-html, body, span, td { font-size: 2vh; margin:0; padding:0; }
-h3 { font-size: 3vh; }
-.tzDisp { font-size: 3vh; padding:1vh; }
+.tzDisp { padding:1vh; }
+.resultArea { text-align:right; background-color:white; }
+.tableComp { border: solid .2vh darkblue; background-color:white; color:black; }
 </style>
 </head>
-<body>
+<body bgcolor=black style="color:white;">
 <h3 class='topbar'>Times in different zones</h2>
 <table align=center>
   <tr><td><div id="tzDivs"></div></td></tr>
@@ -26,41 +26,49 @@ h3 { font-size: 3vh; }
 
 <hr style="margin:0;padding:0;margin-bottom:2vh;"/>
 <table align=center
-  border=1 cellspacing=0 cellpadding=2
-  bordercolor=darkblue
-  style='border: solid .2vh darkblue;'>
-  <tr><td class='biggerText' bgcolor=darkblue style='color:white;'>DateDiff</td></tr>
-  <tr><td align=center class='biggerText'>
+  border=1 cellspacing=0 cellpadding=2 bordercolor=darkblue
+  class="tableComp">
+  <tr><td bgcolor=darkblue style='color:white;'>DateDiff</td></tr>
+  <tr><td align=center>
         <b>d1</b> <input type=date id=d1>
     <br><b>d2</b> <input type=date id=d2>
     <br><button onClick='doDateDiff()'>=</button>
-    <br><span class='biggerText' id=ddResult>???</span>
+    <div class=resultArea id=ddResult>???</div>
   </td></tr>
 </table>
 
 <hr style="margin:0;padding:0;margin-top:1vh;margin-bottom:1vh;"/>
 <table align=center
-  border=1 cellspacing=0 cellpadding=2
-  bordercolor=darkblue
-  style='border: solid .2vh darkblue;'>
-  <tr><td class='biggerText' bgcolor=darkblue style='color:white;'>Add Days to Date</td></tr>
-  <tr><td align=right class='biggerText'>
+  border=1 cellspacing=0 cellpadding=2 bordercolor=darkblue
+  class="tableComp">
+  <tr><td bgcolor=darkblue style='color:white;'>Add Days to Date</td></tr>
+  <tr><td align=right>
         <b>date </b> <input type=date id=d3>
     <br><b>days_to_add </b> <input type=number id=days_to_add_3 style='width:9vh;'>
     <br><button onClick='doDateAdd()'>=</button>
-    <br><span class='biggerText' id=dateAddResult>???</span>
+    <div class=resultArea id=dateAddResult>???</div>
   </td></tr>
 </table>
 
 <hr style="margin:0;padding:0;margin-top:1vh;margin-bottom:1vh;"/>
 <table align=center
-  border=1 cellspacing=0 cellpadding=2
-  bordercolor=darkblue
-  style='border: solid .2vh darkblue;'>
-  <tr><td class='biggerText' bgcolor=darkblue style='color:white;'>datetime to epoch</td></tr>
-  <tr><td align=right class='biggerText'>
+  border=1 cellspacing=0 cellpadding=2 bordercolor=darkblue
+  class="tableComp">
+  <tr><td bgcolor=darkblue style='color:white;'>datetime to epoch</td></tr>
+  <tr><td align=right>
         <input type="datetime-local" id="dt0">
-    <div class='biggerText' id=dt_to_epoch_Result>???</div>
+    <div class="resultArea" id=dt_to_epoch_Result>???</div>
+  </td></tr>
+</table>
+
+<hr style="margin:0;padding:0;margin-top:1vh;margin-bottom:1vh;"/>
+<table align=center
+  border=1 cellspacing=0 cellpadding=2 bordercolor=darkblue
+  class="tableComp">
+  <tr><td bgcolor=darkblue style='color:white;'>epoch to datetime</td></tr>
+  <tr><td align=right>
+    <div><input type="number" placeholder="epoch seconds" id="epoch_seconds"></div>
+    <div class=resultArea id=epoch_to_dt_Result>???</div>
   </td></tr>
 </table>
 
@@ -75,6 +83,7 @@ const userLocale =
   navigator.languages && navigator.languages.length
     ? navigator.languages[0]
     : navigator.language;
+const LocalTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 function doDateAdd() {
    var d3 = document.getElementById('d3').valueAsDate;
    var d3str = formattedDate(d3);
@@ -84,7 +93,7 @@ function doDateAdd() {
    } else {
        var d3Time = d3.getTime();
        var resultDate = new Date(d3Time + HALF_DAY_MILLIS + days_to_add * ONE_DAY_MILLIS);
-       $('#dateAddResult').html($('<div>', {class:'biggerText', style: 'text-align:right;'})
+       $('#dateAddResult').html($('<div>', { style: 'text-align:right;'})
          .append(
            'date('+d3str+')'+'<br>+ days_to_add('+days_to_add+')'+'<br>= <b>'+formattedDate(resultDate)+'</b>'
          )
@@ -105,12 +114,37 @@ function doDateDiff() {
            smaller = d1Time>=d2Time?d2str:d1str,
            ddiff   = d1Time>=d2Time?d1Time-d2Time:d2Time-d1Time;
        ddiff = Math.floor(ddiff/(86400*1000));
-       $('#ddResult').html($('<div>', {class:'biggerText', style: 'text-align:right;'})
+       $('#ddResult').html($('<div>', {style: 'text-align:right;'})
          .append(
            ''+bigger+'<br>- '+smaller+'<br>= <b>'+ddiff+' days</b>'
          )
        );
    }
+}
+function pad(n) {
+    n = ''+n;
+    if (n.length<2) n = '0'+n;
+    return n;
+}
+function yyyy_mm_dd_hh_mm_ss_utc(dt) {
+   var yyyy_mm_dd = [dt.getUTCFullYear(),
+       pad(1+dt.getUTCMonth()),
+       pad(dt.getUTCDate())].join('-');
+   var hh_mm_ss = [
+       pad(dt.getUTCHours()),
+       pad(dt.getUTCMinutes()),
+       pad(dt.getUTCDate())].join(':');
+   return yyyy_mm_dd+' '+hh_mm_ss;
+}
+function yyyy_mm_dd_hh_mm_ss_local(dt) {
+   var yyyy_mm_dd = [dt.getFullYear(),
+       pad(1+dt.getMonth()),
+       pad(dt.getDate())].join('-');
+   var hh_mm_ss = [
+       pad(dt.getHours()),
+       pad(dt.getMinutes()),
+       pad(dt.getDate())].join(':');
+   return yyyy_mm_dd+' '+hh_mm_ss;
 }
 function formattedDate(dtObj) {
     var format_options = {
@@ -122,7 +156,7 @@ function formattedDate(dtObj) {
     var formatter = new Intl.DateTimeFormat(userLocale, format_options);
     return formatter.format(dtObj);
 }
-function datetime4tz(tz) {
+function datetime4tz(tz,dt) {
     var format_options = {
 	timeZone: tz,
 	hour12: false,
@@ -133,7 +167,7 @@ function datetime4tz(tz) {
 	minute: 'numeric'
     };
     var formatter = new Intl.DateTimeFormat(userLocale, format_options);
-    return formatter.format(new Date());
+    return formatter.format(dt ? dt : new Date());
 }
 function rebuildTimezonesDiv(zones) {
     $('#tzDivs').html('');
@@ -155,8 +189,7 @@ $(document).ready(function() {
         return res;
     }, {});
     //console.dir(params);
-    var localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    var zones = [localTimezone];
+    var zones = [LocalTimezone];
     var ignoredStrs = [];
     if (params.z) {
         var zones0 = {};
@@ -173,7 +206,7 @@ $(document).ready(function() {
                 }
             });
         });
-        delete zones0[localTimezone];
+        delete zones0[LocalTimezone];
         //console.dir(['zones0', zones0]);
         for (tz in zones0) { zones.push(tz); }
         //console.dir(['zones', zones]);
@@ -187,8 +220,23 @@ $(document).ready(function() {
         if (dt) {
             var ms = dt.getTime();
             var secs = Math.floor(ms/1000);
-            $('#dt_to_epoch_Result').text(secs+' seconds');
+            $('#dt_to_epoch_Result').text('');
+            $('#dt_to_epoch_Result').append($('<div>').text(''+secs+' seconds'));
+            $('#dt_to_epoch_Result').append($('<div>').text('UTC: '+yyyy_mm_dd_hh_mm_ss_utc(dt)));
+            $('#dt_to_epoch_Result').append($('<div>').text(LocalTimezone+': '+yyyy_mm_dd_hh_mm_ss_local(dt)));
         }
     });
+
+    $('#epoch_seconds').on('change', function(){
+        var epoch_seconds = $('#epoch_seconds').val();
+        if (epoch_seconds) {
+           var dt = new Date(1000*epoch_seconds);
+            $('#epoch_to_dt_Result').text('');
+            $('#epoch_to_dt_Result').append($('<div>').text(epoch_seconds+' seconds'));
+            $('#epoch_to_dt_Result').append($('<div>').html('UTC: '+yyyy_mm_dd_hh_mm_ss_utc(dt)));
+            $('#epoch_to_dt_Result').append($('<div>').text(LocalTimezone+': '+yyyy_mm_dd_hh_mm_ss_local(dt)));
+        }
+    });
+
 });
 </script>
