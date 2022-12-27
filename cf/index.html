@@ -1,0 +1,32 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, height=device-height initial-scale=1">
+<script src="//code.jquery.com/jquery-3.6.3.min.js"></script>
+<title>celcius farenheit conversion table</title>
+<style>
+html, body { margin:0; padding:0; }
+div, h3 { font-size:4vh; }
+.topbar { background-color:darkblue; padding:1vh; margin:0; color:white; }
+</style>
+</head>
+<body>
+<h3 class=topbar>celcius farenheit table</h3>
+<table align=center>
+<tr><td><div id="c2f"></div></td></tr>
+</table>
+</body>
+<script>
+$(document).ready(function(){
+  for (var c10 = 360; c10<408; c10++) {
+    var c = c10/10, f10 = Math.round(320+((c10*9)/5));
+    var f = f10/10;
+    c = c10%10==0 ? '<b>'+c+' C</b>' : c+' C';
+    f = f10%10==0 ? '<b>'+f+' F</b>' : f+' F';
+    var $div = $('<div>', {style:'border-bottom:lightgrey 1px solid;padding:2px;'});
+    $div.append($('<span>', {style:'padding-right:6vh;'}).html(c));
+    $div.append($('<span>', {style:'float:right;'}).html(f));
+    $('#c2f').append($div);
+  }
+});
+</script>
+</html>
