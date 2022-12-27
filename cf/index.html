@@ -13,11 +13,15 @@ div, h3 { font-size:4vh; }
 <h3 class=topbar>celcius farenheit table</h3>
 <table align=center>
 <tr><td><div id="c2f"></div></td></tr>
+<tr><td align=center><button id="more">load more</button></td></tr>
 </table>
 </body>
 <script>
-$(document).ready(function(){
-  for (var c10 = 360; c10<408; c10++) {
+var MIN_C10 = 360;
+var MAX_C10 = 401;
+function populateConversionTable(minC10,maxC10) {
+  MIN_C10 = maxC10; MAX_C10 = MIN_C10+10;
+  for (var c10 = minC10; c10<maxC10; c10++) {
     var c = c10/10, f10 = Math.round(320+((c10*9)/5));
     var f = f10/10;
     c = c10%10==0 ? '<b>'+c+' C</b>' : c+' C';
@@ -27,6 +31,12 @@ $(document).ready(function(){
     $div.append($('<span>', {style:'float:right;'}).html(f));
     $('#c2f').append($div);
   }
+}
+$(document).ready(function(){
+  populateConversionTable(MIN_C10, MAX_C10);
+  $('#more').on('click', function(){ 
+    populateConversionTable(MIN_C10, MAX_C10);
+  });
 });
 </script>
 </html>
